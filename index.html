@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
 <meta charset="utf-8">
-
 <title>RajjeMap</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link
-href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
-rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css" rel="stylesheet">
 
-<link
-rel="stylesheet"
-href="css/style.css">
+<style>
+body{
+    margin:0;
+}
+#map{
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:100%;
+}
+</style>
 
 </head>
 
@@ -28,25 +31,15 @@ href="css/style.css">
 <script>
 
 const map = new maplibregl.Map({
-
-container:'map',
-
-style:'https://demotiles.maplibre.org/style.json',
-
-center:[73.5,4.2],
-
-zoom:7
-
+    container:'map',
+    style:'https://demotiles.maplibre.org/style.json',
+    center:[73.5,4.2],
+    zoom:7
 });
 
-map.addControl(
-new maplibregl.NavigationControl()
-);
+map.addControl(new maplibregl.NavigationControl());
 
 </script>
 
-<script src="layers/islands.js"></script>
-
 </body>
-
 </html>
