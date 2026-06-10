@@ -9,20 +9,55 @@
 <link href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css" rel="stylesheet">
 
 <style>
-body{
-    margin:0;
+body {
+margin: 0;
+padding: 0;
+font-family: Arial;
 }
-#map{
-    position:absolute;
-    top:0;
-    bottom:0;
-    width:100%;
+
+/* SIDEBAR */
+#sidebar {
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+width: 280px;
+background: #1e1e1e;
+color: white;
+padding: 10px;
+overflow: auto;
+z-index: 2;
+}
+
+#map {
+position: absolute;
+left: 280px;
+top: 0;
+bottom: 0;
+right: 0;
+}
+
+button {
+width: 100%;
+padding: 8px;
+margin: 5px 0;
+cursor: pointer;
 }
 </style>
-
 </head>
 
 <body>
+
+<div id="sidebar">
+<h3>RajjeMap</h3>
+
+<h4>Layers</h4>
+<button onclick="toggleIslands()">Toggle Islands</button>
+
+<h4>Basemap</h4>
+<button onclick="setBasemap('street')">Street</button>
+<button onclick="setBasemap('satellite')">Satellite</button>
+</div>
 
 <div id="map"></div>
 
@@ -30,14 +65,123 @@ body{
 
 <script>
 
+let islandData = null;
+let islandsVisible = true;
+
+/* BASEMAPS */
+const streetStyle = 'https://demotiles.maplibre.org/style.json';
+
+const satelliteStyle = {
+version: 8,
+sources: {
+satellite: {
+type: 'raster',
+tiles: [
+'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+],
+tileSize: 256
+}
+},
+layers: [{
+id: 'satellite',
+type: 'raster',
+source: 'satellite'
+}]
+};
+
+/* MAP */
 const map = new maplibregl.Map({
-    container:'map',
-    style:'https://demotiles.maplibre.org/style.json',
-    center:[73.5,4.2],
-    zoom:7
+container: 'map',
+style: streetStyle,
+center: [73.5, 4.2],
+zoom: 7
 });
 
 map.addControl(new maplibregl.NavigationControl());
+
+/* LOAD ISLAND DATA ONCE */
+fetch('https://services7.arcgis.com/yvCbn3q8PPtPLZIM/ArcGIS/rest/services/island_20240509/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=geojson')
+.then(r => r.json())
+.then(data => {
+islandData = data;
+addIslands();
+});
+
+/* ADD ISLANDS */
+function addIslands() {
+
+if (!map.getSource('islands')) {
+
+map.addSource('islands', {
+type: 'geojson',
+data: islandData
+});
+
+map.addLayer({
+id: 'islands-fill',
+type: 'fill',
+source: 'islands',
+paint: {
+'fill-color': '#00aa88',
+'fill-opacity': 0.5
+}
+});
+
+map.addLayer({
+id: 'islands-outline',
+type: 'line',
+source: 'islands',
+paint: {
+'line-color': '#004d40',
+'line-width': 1
+}
+});
+
+}
+}
+
+/* WAIT FOR STYLE LOAD */
+map.on('load', () => {
+if (islandData) addIslands();
+});
+
+/* TOGGLE ISLANDS */
+function toggleIslands() {
+
+if (!map.getLayer('islands-fill')) return;
+
+const visibility = map.getLayoutProperty('islands-fill', 'visibility');
+
+if (visibility === 'none') {
+map.setLayoutProperty('islands-fill', 'visibility', 'visible');
+map.setLayoutProperty('islands-outline', 'visibility', 'visible');
+} else {
+map.setLayoutProperty('islands-fill', 'visibility', 'none');
+map.setLayoutProperty('islands-outline', 'visibility', 'none');
+}
+
+}
+
+/* BASEMAP SWITCH */
+function setBasemap(type) {
+
+if (type === 'street') {
+map.setStyle(streetStyle);
+
+map.once('styledata', () => {
+addIslands();
+});
+}
+
+if (type === 'satellite') {
+map.setStyle(satelliteStyle);
+
+map.once('styledata', () => {
+addIslands();
+});
+}
+
+}
 
 </script>
 
