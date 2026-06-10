@@ -1,0 +1,38 @@
+// islands.js
+
+map.on('load', () => {
+
+    fetch(
+        'https://services7.arcgis.com/yvCbn3q8PPtPLZIM/ArcGIS/rest/services/island_20240509/FeatureServer/0/query?where=1%3D1&outFields=*&returnGeometry=true&f=geojson'
+    )
+    .then(response => response.json())
+    .then(data => {
+
+        map.addSource('islands', {
+            type: 'geojson',
+            data: data
+        });
+
+        map.addLayer({
+            id: 'islands-fill',
+            type: 'fill',
+            source: 'islands',
+            paint: {
+                'fill-color': '#00aa88',
+                'fill-opacity': 0.5
+            }
+        });
+
+        map.addLayer({
+            id: 'islands-outline',
+            type: 'line',
+            source: 'islands',
+            paint: {
+                'line-color': '#006644',
+                'line-width': 1
+            }
+        });
+
+    });
+
+});
