@@ -14,38 +14,59 @@
 
 <body>
 
-<!-- ========================== HEADER ========================== -->
-<header>
-    <div id="logo">🌊 JazeeraMap</div>
-
-    <!-- SEARCH -->
-    <div id="search">
-        <input id="globalSearch" type="text" placeholder="🔍 Search island, reef, FCODE..." autocomplete="off">
-        <div id="searchSuggestions"></div>
-    </div>
-</header>
-
-<!-- MOBILE BUTTON -->
-<button id="mobileMenuBtn">☰</button>
-
-<!-- ========================== MAIN ========================== -->
-<div id="container">
-
-    <!-- SIDEBAR -->
-    <aside id="sidebar">
-        <h2>📂 Data Catalog</h2>
-        <!-- ui.js builds the catalog here -->
-    </aside>
-
-    <!-- MAP -->
-    <main>
-        <div id="map"></div>
-    </main>
-
+<!-- ==========================
+     LOCK SCREEN
+     Client-side password gate. This only deters casual
+     visitors — the password lives in js/modules/lock.js
+     and is visible to anyone who views page source. Do not
+     rely on this to protect anything genuinely sensitive.
+=========================== -->
+<div id="lockScreen">
+    <form id="lockForm">
+        <div id="lockLogo">🌊 JazeeraMap</div>
+        <p>This site is password protected.</p>
+        <input type="password" id="lockPassword" placeholder="Enter password" autocomplete="off" autofocus>
+        <button type="submit">Enter</button>
+        <div id="lockError">Incorrect password. Try again.</div>
+    </form>
 </div>
 
-<!-- FOOTER -->
-<footer>Version 0.7.0</footer>
+<!-- ========================== APP (hidden until unlocked) ========================== -->
+<div id="appContent">
+
+    <header>
+        <div id="logo">🌊 JazeeraMap</div>
+
+        <!-- SEARCH -->
+        <div id="search">
+            <input id="globalSearch" type="text" placeholder="🔍 Search island, reef, FCODE..." autocomplete="off">
+            <div id="searchSuggestions"></div>
+        </div>
+    </header>
+
+    <!-- MOBILE BUTTON -->
+    <button id="mobileMenuBtn">☰</button>
+
+    <!-- ========================== MAIN ========================== -->
+    <div id="container">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar">
+            <h2>📂 Data Catalog</h2>
+            <!-- ui.js builds the catalog here -->
+        </aside>
+
+        <!-- MAP -->
+        <main>
+            <div id="map"></div>
+        </main>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer>Version 0.7.0</footer>
+
+</div>
 
 <!-- ==========================
      JAVASCRIPT — ORDER IS IMPORTANT
@@ -53,6 +74,9 @@
      (driven by datasetRegistry.js), so there's no separate
      "load data before registry" script tag anymore.
 =========================== -->
+
+<!-- LOCK SCREEN (runs first, blocks everything else until unlocked) -->
+<script src="js/modules/lock.js"></script>
 
 <!-- MAP ENGINE -->
 <script src="https://unpkg.com/maplibre-gl@5.7.0/dist/maplibre-gl.js"></script>
@@ -67,6 +91,7 @@
 <script src="js/modules/queryManager.js"></script>
 <script src="js/modules/layerManager.js"></script>
 <script src="js/modules/basemapManager.js"></script>
+<script src="js/modules/locationManager.js"></script>
 
 <!-- UI -->
 <script src="js/modules/ui.js"></script>

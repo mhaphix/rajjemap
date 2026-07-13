@@ -45,10 +45,61 @@ const PopupManager = {
         const html = `
             <div class="popup-card">
                 <table>${rows}</table>
+                ${this._navigateButton(lngLat)}
             </div>
         `;
 
         this.popup.setLngLat(lngLat).setHTML(html).addTo(this.map);
+    },
+
+    // Lightweight popup for a click on empty map space (no feature there) —
+    // just shows coordinates and a Navigate button, so any point can be
+    // routed to, not only places that exist in the loaded data.
+    showAtPoint(lngLat) {
+        const lng = this._lng(lngLat);
+        const lat = this._lat(lngLat);
+
+        const html = `
+            <div class="popup-card">
+                <table>
+                    <tr><td class="popup-key">Latitude</td><td class="popup-value">${lat.toFixed(6)}</td></tr>
+                    <tr><td class="popup-key">Longitude</td><td class="popup-value">${lng.toFixed(6)}</td></tr>
+                </table>
+                ${this._navigateButton(lngLat)}
+            </div>
+        `;
+
+        this.popup.setLngLat(lngLat).setHTML(html).addTo(this.map);
+    },
+
+    // Builds the "Navigate here" link. If we have a live location (from
+    // LocationManager), routes FROM that position TO the clicked point;
+    // otherwise Google Maps falls back to using the device's own current
+    // location automatically once the link is opened.
+    _navigateButton(lngLat) {
+        const lng = this._lng(lngLat);
+        const lat = this._lat(lngLat);
+
+        let url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+
+        if (typeof LocationManager !== "undefined" && LocationManager.currentPosition) {
+            const origin = LocationManager.currentPosition;
+            url += `&origin=${origin.lat},${origin.lng}`;
+        }
+
+        return `
+            <a class="popup-navigate" href="${url}" target="_blank" rel="noopener">
+                🧭 Navigate here
+            </a>
+        `;
+    },
+
+    _lng(lngLat) {
+        return lngLat.lng !== undefined ? lngLat.lng : lngLat[0];
+    },
+
+    _lat(lngLat) {
+        return lngLat.lat !== undefined ? lngLat.lat : lngLat[1];
     },
 
     close() {
