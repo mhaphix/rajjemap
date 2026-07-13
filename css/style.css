@@ -1,0 +1,253 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Segoe UI, Arial, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    display: grid;
+    grid-template-rows: 60px 1fr 35px;
+}
+
+header {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: linear-gradient(90deg, #04263D, #0B5CAD, #00AFC1);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+
+#logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: .5px;
+}
+
+/* ========================== Global Feature Search ========================== */
+
+#search {
+    position: relative;
+    width: 350px;
+    z-index: 99999;
+}
+
+#globalSearch {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+}
+
+#searchSuggestions {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    width: 100%;
+    max-height: 350px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.3);
+    z-index: 999999;
+    display: none;
+}
+
+.suggestion {
+    padding: 12px;
+    cursor: pointer;
+    color: #003344;
+    border-bottom: 1px solid #ddd;
+}
+
+.suggestion b { font-size: 14px; }
+.suggestion small { color: #777; }
+.suggestion:hover { background: #dff7ff; }
+.suggestion.no-result { cursor: default; color: #999; text-align: center; }
+.suggestion.no-result:hover { background: white; }
+
+#container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    overflow: hidden;
+}
+
+#sidebar {
+    background: #062B45;
+    color: white;
+    overflow-y: auto;
+    padding: 20px;
+    border-right: 1px solid rgba(255,255,255,.08);
+}
+
+#sidebar h2 { font-size: 20px; }
+
+main { position: relative; }
+
+#map { width: 100%; height: 100%; }
+
+footer {
+    background: #04263D;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    font-size: 13px;
+}
+
+.category { margin-bottom: 25px; }
+
+.category h3 {
+    color: #ffffff;
+    font-size: 17px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,.25);
+}
+
+.dataset { margin: 8px 0; }
+
+.dataset label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: .2s;
+}
+
+.dataset label:hover { background: rgba(255,255,255,.08); }
+
+.dataset input { width: 16px; height: 16px; }
+.dataset span { font-size: 15px; }
+
+/* ========================== Popup ========================== */
+
+.popup-card table {
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.popup-card td {
+    padding: 4px 8px;
+    vertical-align: top;
+    border-bottom: 1px solid #eee;
+}
+
+.popup-card .popup-key {
+    font-weight: 600;
+    color: #04263D;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.popup-card .popup-value {
+    color: #333;
+}
+
+/* ========================== Query Panel ========================== */
+
+#queryPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#queryPanel select,
+#queryPanel input {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+}
+
+#queryPanel button {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    background: #0B5CAD;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+    transition: .2s;
+}
+
+#queryPanel button:hover { background: #00AFC1; }
+
+#queryResultCount {
+    font-size: 12px;
+    color: #cde;
+}
+
+/* ========================== Mobile Responsive ========================== */
+
+#mobileMenuBtn { display: none; }
+
+@media (max-width: 768px) {
+
+    header {
+        height: 70px;
+        padding: 0 10px;
+    }
+
+    #logo { font-size: 22px; }
+
+    #search { flex: 1; }
+
+    #search input {
+        width: 100%;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    #container { display: block; }
+
+    #sidebar {
+        position: absolute;
+        top: 70px;
+        left: -280px;
+        width: 260px;
+        height: calc(100vh - 90px);
+        z-index: 999;
+        transition: 0.3s;
+        overflow-y: auto;
+        box-shadow: 5px 0 15px rgba(0,0,0,.4);
+    }
+
+    #sidebar.active { left: 0; }
+
+    main {
+        width: 100%;
+        height: calc(100vh - 90px);
+    }
+
+    #map { width: 100%; height: 100%; }
+
+    footer { display: none; }
+
+    #mobileMenuBtn {
+        display: block;
+        position: absolute;
+        top: 80px;
+        left: 10px;
+        z-index: 1000;
+        background: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 22px;
+        box-shadow: 0 3px 10px #0005;
+    }
+}

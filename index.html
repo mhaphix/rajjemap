@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JazeeraMap - Maldives Data</title>
+
+<!-- MAPLIBRE CSS -->
+<link href="https://unpkg.com/maplibre-gl@5.7.0/dist/maplibre-gl.css" rel="stylesheet">
+
+<!-- APP CSS -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<!-- ========================== HEADER ========================== -->
+<header>
+    <div id="logo">🌊 JazeeraMap</div>
+
+    <!-- SEARCH -->
+    <div id="search">
+        <input id="globalSearch" type="text" placeholder="🔍 Search island, reef, FCODE..." autocomplete="off">
+        <div id="searchSuggestions"></div>
+    </div>
+</header>
+
+<!-- MOBILE BUTTON -->
+<button id="mobileMenuBtn">☰</button>
+
+<!-- ========================== MAIN ========================== -->
+<div id="container">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+        <h2>📂 Data Catalog</h2>
+        <!-- ui.js builds the catalog here -->
+    </aside>
+
+    <!-- MAP -->
+    <main>
+        <div id="map"></div>
+    </main>
+
+</div>
+
+<!-- FOOTER -->
+<footer>Version 0.7.0</footer>
+
+<!-- ==========================
+     JAVASCRIPT — ORDER IS IMPORTANT
+     Local data is now fetched by LayerManager itself
+     (driven by datasetRegistry.js), so there's no separate
+     "load data before registry" script tag anymore.
+=========================== -->
+
+<!-- MAP ENGINE -->
+<script src="https://unpkg.com/maplibre-gl@5.7.0/dist/maplibre-gl.js"></script>
+
+<!-- REGISTRIES -->
+<script src="js/modules/datasetRegistry.js"></script>
+<script src="js/modules/basemapRegistry.js"></script>
+
+<!-- MANAGERS -->
+<script src="js/modules/popupManager.js"></script>
+<script src="js/modules/searchManager.js"></script>
+<script src="js/modules/queryManager.js"></script>
+<script src="js/modules/layerManager.js"></script>
+<script src="js/modules/basemapManager.js"></script>
+
+<!-- UI -->
+<script src="js/modules/ui.js"></script>
+
+<!-- MAIN APP -->
+<script src="js/app.js"></script>
+
+</body>
+</html>
