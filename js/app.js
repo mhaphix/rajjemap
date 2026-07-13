@@ -47,6 +47,7 @@ map.on("load", () => {
     QueryManager.initialize(map);
     LayerManager.initialize(map);
     LocationManager.initialize(map);
+    NavigationManager.initialize(map);
 
     /******************************
      * BUILD SIDEBAR

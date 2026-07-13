@@ -15,6 +15,11 @@
  *    for any geometry type.
  * 3. Clicking a result now also highlights the feature via
  *    LayerManager, matching the "click on map = select" behavior.
+ *
+ * NEW: a layer dropdown next to the search box lets you scope
+ * a search to one specific loaded layer, or "All Layers". The
+ * same underlying query() method is reused by NavigationManager
+ * for the From/To fields in the directions panel.
  ************************************************/
 
 const SearchManager = {
@@ -25,12 +30,14 @@ const SearchManager = {
     index: [],
 
     debounceTimer: null,
+    activeLayerFilter: "all",
 
     initialize(map) {
         this.map = map;
 
         const input = document.getElementById("globalSearch");
         const resultBox = document.getElementById("searchSuggestions");
+        const layerFilter = document.getElementById("searchLayerFilter");
 
         input.addEventListener("input", () => {
             clearTimeout(this.debounceTimer);
@@ -38,6 +45,13 @@ const SearchManager = {
             this.debounceTimer = setTimeout(() => {
                 this._runSearch(value, input, resultBox);
             }, 150);
+        });
+
+        layerFilter.addEventListener("change", () => {
+            this.activeLayerFilter = layerFilter.value;
+            if (input.value.trim().length >= 2) {
+                this._runSearch(input.value, input, resultBox);
+            }
         });
 
         // close suggestions when clicking outside the search box
@@ -61,6 +75,7 @@ const SearchManager = {
         });
 
         console.log("🔍 Search indexed:", this.index.length, "features total");
+        this._refreshLayerFilterOptions();
     },
 
     /************************************************
@@ -70,22 +85,59 @@ const SearchManager = {
      ************************************************/
     removeDataset(datasetId) {
         this.index = this.index.filter(entry => entry.dataset.id !== datasetId);
+
+        if (this.activeLayerFilter === datasetId) {
+            this.activeLayerFilter = "all";
+            const layerFilter = document.getElementById("searchLayerFilter");
+            if (layerFilter) layerFilter.value = "all";
+        }
+
+        this._refreshLayerFilterOptions();
+    },
+
+    _refreshLayerFilterOptions() {
+        const layerFilter = document.getElementById("searchLayerFilter");
+        if (!layerFilter) return;
+
+        const loadedDatasets = [...new Map(
+            this.index.map(entry => [entry.dataset.id, entry.dataset])
+        ).values()];
+
+        const current = layerFilter.value;
+
+        layerFilter.innerHTML = `<option value="all">All Layers</option>` +
+            loadedDatasets.map(d => `<option value="${d.id}">${d.name}</option>`).join("");
+
+        const stillLoaded = loadedDatasets.some(d => d.id === current);
+        layerFilter.value = stillLoaded ? current : "all";
+        this.activeLayerFilter = layerFilter.value;
+    },
+
+    /************************************************
+     * CORE QUERY (reusable — used by the main search
+     * box AND by NavigationManager's From/To fields)
+     ************************************************/
+    query(text, layerId = "all", limit = 15) {
+        const needle = text.toLowerCase().trim();
+        if (needle.length < 2) return [];
+
+        return this.index
+            .filter(entry => layerId === "all" || entry.dataset.id === layerId)
+            .filter(entry => entry.searchText.includes(needle))
+            .slice(0, limit);
     },
 
     _runSearch(raw, input, resultBox) {
-        const text = raw.toLowerCase().trim();
         resultBox.innerHTML = "";
 
-        if (text.length < 2) {
+        if (raw.trim().length < 2) {
             resultBox.style.display = "none";
             return;
         }
 
         resultBox.style.display = "block";
 
-        const results = this.index
-            .filter(entry => entry.searchText.includes(text))
-            .slice(0, 15);
+        const results = this.query(raw, this.activeLayerFilter);
 
         if (!results.length) {
             resultBox.innerHTML = `<div class="suggestion no-result">No matches found</div>`;
@@ -98,15 +150,8 @@ const SearchManager = {
     },
 
     _buildSuggestion(entry, input, resultBox) {
+        const name = this.getDisplayName(entry.feature);
         const p = entry.feature.properties;
-
-        const name =
-            p.islandName || p.IslandName || p.ISLANDNAME || p.islandname ||
-            p.hname || p.HouseName ||
-            p.ReefName || p.reefName ||
-            p.NAME || p.Name || p.name ||
-            "Unnamed Feature";
-
         const code = p.FCODE || p.fcode || p.ReefCode || p.reefCode || p.CODE || p.block_code || "";
         const atoll = p.atoll || p.Atoll || p.ATOLL || "";
 
@@ -126,6 +171,19 @@ const SearchManager = {
         };
 
         return div;
+    },
+
+    // Shared "best guess" display name for a feature, used by both the
+    // main search suggestions and the navigation panel's suggestions.
+    getDisplayName(feature) {
+        const p = feature.properties;
+        return (
+            p.islandName || p.IslandName || p.ISLANDNAME || p.islandname ||
+            p.hname || p.HouseName ||
+            p.ReefName || p.reefName ||
+            p.NAME || p.Name || p.name ||
+            "Unnamed Feature"
+        );
     },
 
     /************************************************
@@ -149,6 +207,17 @@ const SearchManager = {
         if (typeof PopupManager !== "undefined") {
             PopupManager.show(bounds.getCenter(), feature.properties);
         }
+    },
+
+    // Returns a single representative [lng, lat] for any feature —
+    // used by NavigationManager, which needs one coordinate per
+    // origin/destination regardless of geometry type.
+    getCoordinate(feature) {
+        const bounds = new maplibregl.LngLatBounds();
+        this._extendBoundsForGeometry(bounds, feature.geometry);
+        if (bounds.isEmpty()) return null;
+        const center = bounds.getCenter();
+        return [center.lng, center.lat];
     },
 
     // Recursively walks any GeoJSON geometry (Point, LineString, Polygon,

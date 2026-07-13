@@ -250,6 +250,11 @@ const LayerManager = {
         this.map.on("click", layerId, (e) => {
             if (!e.features.length) return;
 
+            // while picking an origin/destination for directions, let
+            // NavigationManager's own click handler use the point instead
+            // of opening this feature's popup
+            if (typeof NavigationManager !== "undefined" && NavigationManager.pickMode) return;
+
             const feature = e.features[0];
             this.selectFeature(feature);
 

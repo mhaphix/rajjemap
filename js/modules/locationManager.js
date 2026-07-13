@@ -53,6 +53,10 @@ const LocationManager = {
 
     _bindEmptyMapClick() {
         this.map.on("click", (e) => {
+            // don't show the generic coordinate popup while the user is
+            // actively picking an origin/destination for directions
+            if (typeof NavigationManager !== "undefined" && NavigationManager.pickMode) return;
+
             // if the click landed on an interactive dataset layer,
             // LayerManager's own handler already handles it — skip.
             const dataLayerIds = Object.keys(LayerManager.loadedLayers)

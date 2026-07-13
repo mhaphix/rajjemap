@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JazeeraMap - Maldives Data</title>
 
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <!-- MAPLIBRE CSS -->
 <link href="https://unpkg.com/maplibre-gl@5.7.0/dist/maplibre-gl.css" rel="stylesheet">
 
@@ -35,17 +40,63 @@
 <div id="appContent">
 
     <header>
-        <div id="logo">🌊 JazeeraMap</div>
+        <div id="logo"><span class="logo-icon">🌊</span><span class="logo-text">JazeeraMap</span></div>
 
         <!-- SEARCH -->
         <div id="search">
-            <input id="globalSearch" type="text" placeholder="🔍 Search island, reef, FCODE..." autocomplete="off">
-            <div id="searchSuggestions"></div>
+            <select id="searchLayerFilter" title="Search within...">
+                <option value="all">All Layers</option>
+            </select>
+            <div id="searchInputWrap">
+                <input id="globalSearch" type="text" placeholder="Search island, reef, plot, address..." autocomplete="off">
+                <div id="searchSuggestions"></div>
+            </div>
         </div>
+
+        <button id="navigateOpenBtn" title="Get directions">
+            <span class="nav-icon">🧭</span><span class="nav-label">Navigate</span>
+        </button>
     </header>
 
     <!-- MOBILE BUTTON -->
     <button id="mobileMenuBtn">☰</button>
+
+    <!-- ========================== NAVIGATION PANEL ========================== -->
+    <div id="navPanelOverlay"></div>
+    <div id="navPanel">
+        <div id="navPanelHeader">
+            <h3>🧭 Get Directions</h3>
+            <button id="navPanelClose">&times;</button>
+        </div>
+
+        <div id="navPanelBody">
+
+            <div class="navField">
+                <label>From</label>
+                <div class="navInputRow">
+                    <input type="text" id="navOriginInput" placeholder="Current location, address, or plot..." autocomplete="off">
+                    <button id="navUseLocationBtn" title="Use my current location">📍</button>
+                    <button id="navPickOriginBtn" title="Pick a point on the map">🗺️</button>
+                </div>
+                <div class="navSuggestions" id="navOriginSuggestions"></div>
+            </div>
+
+            <button id="navSwapBtn" title="Swap origin and destination">⇅</button>
+
+            <div class="navField">
+                <label>To</label>
+                <div class="navInputRow">
+                    <input type="text" id="navDestinationInput" placeholder="Address, plot, or island..." autocomplete="off">
+                    <button id="navPickDestinationBtn" title="Pick a point on the map">🗺️</button>
+                </div>
+                <div class="navSuggestions" id="navDestinationSuggestions"></div>
+            </div>
+
+            <div id="navPickHint"></div>
+
+            <button id="navGoBtn" disabled>Get Directions</button>
+        </div>
+    </div>
 
     <!-- ========================== MAIN ========================== -->
     <div id="container">
@@ -64,7 +115,7 @@
     </div>
 
     <!-- FOOTER -->
-    <footer>Version 0.7.0</footer>
+    <footer>Version 0.8.0</footer>
 
 </div>
 
@@ -92,6 +143,7 @@
 <script src="js/modules/layerManager.js"></script>
 <script src="js/modules/basemapManager.js"></script>
 <script src="js/modules/locationManager.js"></script>
+<script src="js/modules/navigationManager.js"></script>
 
 <!-- UI -->
 <script src="js/modules/ui.js"></script>

@@ -44,3 +44,17 @@
 - `layerManager.js` had the same click/popup/cursor event handlers
   bound three times over (copy-paste artifacts), firing popups and
   console logs multiple times per click.
+
+## v0.8.0
+### Added
+- Layer-filtered search: a dropdown next to the search box scopes
+  results to "All Layers" or one specific loaded layer.
+- Full directions panel (🧭 Navigate button in header): set an
+  origin and destination independently via search, live location,
+  or picking a point directly on the map, then open the route in
+  Google Maps. Works from any loaded layer's features, not just
+  points already clicked.
+- Visual redesign: named color/type token system (lagoon/reef/coral
+  palette, Space Grotesk + Inter typefaces), mobile layout now uses
+  a bottom-sheet sidebar and directions panel instead of a fixed
+  side drawer, larger touch targets throughout.
